@@ -1,0 +1,51 @@
+name: RC to Master
+
+on:
+  pull_request:
+    branches: master
+
+jobs:
+  build_and_test:
+    name: 🏗️ Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: SETUP NODEJS
+        uses: actions/setup-node@v1
+        with:
+            node-version: "14.x"
+      - name: 💸  Cache node_modules
+        uses: actions/cache@v2
+        with:
+            path: ~/.pnpm-store
+            key: $-node-$
+            restore-keys: |
+              $-node
+      - name: SETUP PNPM
+        uses: pnpm/action-setup@v1.2.1
+        with:
+            version: 5.14.1
+            run_install: |
+              - recursive: true
+                args: [--frozen-lockfile]
+      - name: 🛠️ Build
+        run: pnpm run build
+      - name: 🧪 Test
+        run: pnpm run test:ci
+      - name: 🆙Load Test Coverage
+        uses: actions/upload-artifact@v1
+        with:
+          name: code-coverage
+          path: coverage
+      - name: Open Issue
+        if: failure()
+        run: |
+          curl --request POST \
+          --url https://api.github.com/repos/${{ github.repository }}/issues \
+          --header 'authorization: Bearer ${{ secrets.CUSTOM_TOKEN }}' \
+          --header 'content-type: application/json' \
+          --data '{
+            "title": "PR was not successfull. Please resolve the issues: ${{ github.sha }}",
+            "body": "This issue was automatically created by the GitHub Action workflow **${{ github.workflow }}**. \n\n The commit hash was: _${{ github.sha }}_.",
+            "assignees": ["${{ github.event.pull_request.user.login }}"]
+            }'
