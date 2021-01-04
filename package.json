@@ -1,6 +1,6 @@
 {
-  "name": "css-features",
-  "version": "1.0.0",
+  "name": "@solx/css-features",
+  "version": "0.0.0-development",
   "description": "'Typescriptification of css-media-features package",
   "main": ".dist/index.js",
   "types": "dist/index.d.ts",
