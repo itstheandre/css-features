@@ -3,14 +3,18 @@ import { mediaFeatures, rangedValues } from "./utils";
 
 const withRange = mediaFeatures.reduce((acc: string[], val: string) => {
   const values =
-    rangedValues.indexOf(val) !== -1 ? [val, `min-${val}`, `max-$}{val}`] : [];
+    rangedValues.indexOf(val) !== -1 ? [val, `min-${val}`, `max-${val}`] : [];
   return [...acc, ...values];
 }, []);
 
+/**
+ *
+ * @param info this is an optional `range` property that will add stuff like min and max values to the media query constructor
+ */
 export const getMediaFeatures = (
-  options: IMediaFeaturesOptions = { range: false }
+  info: IMediaFeaturesOptions = { range: false }
 ) => {
-  if (options.range) {
+  if (info.range) {
     return withRange;
   }
 
